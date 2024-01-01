@@ -72,6 +72,11 @@
       "name": "extension-androidtools",
       "type": "haxelib",
       "version": null
+    },
+    {
+      "name": "colyseus",
+      "type": "haxelib",
+      "version": "0.15.2"
     }
   ]
 }
