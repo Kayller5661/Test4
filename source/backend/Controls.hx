@@ -145,7 +145,7 @@ class Controls
 		if (result)
 			controllerMode = false;
 
-		return result || _myGamepadJustPressed(gamepadBinds[key]) == true #if mobileC || mobileControlsPressed(mobileBinds[key]) == true #end;
+		return result || _myGamepadJustPressed(gamepadBinds[key]) == true #if mobileC || mobileControlsJustPressed(mobileBinds[key]) == true #end;
 	}
 
 	public function pressed(key:String)
@@ -154,7 +154,7 @@ class Controls
 		if (result)
 			controllerMode = false;
 
-		return result || _myGamepadPressed(gamepadBinds[key]) == true #if mobileC || mobileControlsJustPressed(mobileBinds[key]) == true #end;
+		return result || _myGamepadPressed(gamepadBinds[key]) == true #if mobileC || mobileControlsPressed(mobileBinds[key]) == true #end;
 	}
 
 	public function justReleased(key:String)
