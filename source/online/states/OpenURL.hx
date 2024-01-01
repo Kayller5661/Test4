@@ -74,7 +74,7 @@ class OpenURL extends MusicBeatSubstate {
 
     override function update(elapsed:Float) {
         super.update(elapsed);
-
+		#if desktop
         if (FlxG.mouse.justMoved) {
 			if (mouseInsideOf(yesBg)) {
 				selected = 0;
@@ -86,6 +86,7 @@ class OpenURL extends MusicBeatSubstate {
 				selected = -1;
             }
         }
+		#end
 
 		if (controls.UI_LEFT_P || controls.UI_RIGHT_P) {
 			selected++;
@@ -99,7 +100,7 @@ class OpenURL extends MusicBeatSubstate {
         }
 
 		if (selected == 0) {
-            if (controls.ACCEPT || FlxG.mouse.justPressed) {
+            if (controls.ACCEPT #if desktop || FlxG.mouse.justPressed #end) {
 				FlxG.openURL(url);
 				close();
             }
@@ -107,7 +108,7 @@ class OpenURL extends MusicBeatSubstate {
 			no.alpha = 0.7;
 		}
 		else if (selected == 1) {
-			if (controls.ACCEPT || FlxG.mouse.justPressed) {
+			if (controls.ACCEPT #if desktop || FlxG.mouse.justPressed #end) {
                 close();
             }
 			yes.alpha = 0.7;
@@ -122,11 +123,12 @@ class OpenURL extends MusicBeatSubstate {
 			close();
 		}
     }
-
+	#if desktop
 	function mouseInsideOf(object:FlxObject) {
 		return FlxG.mouse.x >= object.x
 			&& FlxG.mouse.x <= object.x + object.width
 			&& FlxG.mouse.y >= object.y
 			&& FlxG.mouse.y <= object.y + object.height;
 	}
+	#end
 }

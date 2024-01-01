@@ -11,7 +11,7 @@ import llua.Lua;
 #if ACHIEVEMENTS_ALLOWED
 import backend.Achievements;
 #end
-
+#if mobileC 
 //Mobile Controls
 import mobile.objects.MobileControls;
 import mobile.substates.MobileControlsSubState;
@@ -19,6 +19,7 @@ import mobile.flixel.FlxHitbox;
 import mobile.flixel.FlxVirtualPad;
 import mobile.flixel.FlxVirtualPadExtra;
 import mobile.flixel.input.FlxMobileInputID;
+#end
 
 #if sys
 import sys.*;

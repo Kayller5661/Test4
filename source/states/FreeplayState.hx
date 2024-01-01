@@ -188,11 +188,17 @@ class FreeplayState extends MusicBeatState
 				});
 			});
 		}
-
+		#if mobileC
+		addVirtualPad(LEFT_FULL, A_B_C_X_Y_Z);
+		#end
 		super.create();
 	}
 
 	override function closeSubState() {
+		#if mobileC
+		removeVirtualPad();
+		addVirtualPad(LEFT_FULL, A_B_C_X_Y_Z);
+		#end
 		changeSelection(0, false);
 		persistentUpdate = true;
 		super.closeSubState();
@@ -254,7 +260,7 @@ class FreeplayState extends MusicBeatState
 		positionHighscore();
 
 		var shiftMult:Int = 1;
-		if(FlxG.keys.pressed.SHIFT) shiftMult = 3;
+		if(FlxG.keys.pressed.SHIFT #if mobileC || virtualPad.buttonZ.pressed #end) shiftMult = 3;
 
 		if(songs.length > 1)
 		{
@@ -309,7 +315,7 @@ class FreeplayState extends MusicBeatState
 			_updateSongLastDifficulty();
 		}
 
-		if (controls.BACK)
+		if (controls.BACK #if mobileC && virtualPad.buttonC.pressed #end)
 		{
 			persistentUpdate = false;
 			if(colorTween != null) {
@@ -325,12 +331,12 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 
-		if(FlxG.keys.justPressed.CONTROL)
+		if(FlxG.keys.justPressed.CONTROL #if mobileC || virtualPad.buttonC.justPressed #end)
 		{
-			persistentUpdate = false;
+			persistentUpdate #if mobileC = virtualPad.visible #end = false;
 			openSubState(new GameplayChangersSubstate());
 		}
-		else if(FlxG.keys.justPressed.SPACE)
+		else if(FlxG.keys.justPressed.SPACE #if mobileC || virtualPad.buttonX.justPressed #end)
 		{
 			if(instPlaying != curSelected)
 			{
@@ -439,9 +445,9 @@ class FreeplayState extends MusicBeatState
 				#end
 			}
 		}
-		else if(controls.RESET)
+		else if(controls.RESET #if mobileC || virtualPad.buttonY.justPressed #end)
 		{
-			persistentUpdate = false;
+			persistentUpdate #if mobileC = virtualPad.visible #end = false;
 			openSubState(new ResetScoreSubState(songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter));
 			FlxG.sound.play(Paths.sound('scrollMenu'));
 		}

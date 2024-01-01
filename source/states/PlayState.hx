@@ -678,7 +678,12 @@ class PlayState extends MusicBeatState
 					initHScript(folder + file);
 			}
 		#end
-
+		#if mobileC
+		addMobileControls(false);
+		#if !android
+		addVirtualPad(NONE, P);
+		#end
+		#end
 		startCallback();
 		RecalculateRating();
 		if (GameClient.isConnected())
@@ -1563,8 +1568,8 @@ class PlayState extends MusicBeatState
 	override function openSubState(SubState:FlxSubState)
 	{
 		stagesFunc(function(stage:BaseStage) stage.openSubState(SubState));
-		if (paused)
-		{
+		if(paused){
+			#if mobileC mobileControls.visible #if !android = virtualPad.visible #end = false; #end
 			if (FlxG.sound.music != null)
 			{
 				FlxG.sound.music.pause();
@@ -1592,6 +1597,7 @@ class PlayState extends MusicBeatState
 	override function closeSubState()
 	{
 		stagesFunc(function(stage:BaseStage) stage.closeSubState());
+		#if mobileC mobileControls.visible #if !android = virtualPad.visible #end = true; #end
 		if (paused)
 		{
 			if (FlxG.sound.music != null && !startingSong)
@@ -1733,7 +1739,7 @@ class PlayState extends MusicBeatState
 			botplayTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
 		}
 
-		if (controls.PAUSE && startedCountdown && canPause)
+		if ((#if android FlxG.android.justReleased.BACK || #end controls.PAUSE) && startedCountdown && canPause)
 		{
 			var ret:Dynamic = callOnScripts('onPause', null, true);
 			if(ret != FunkinLua.Function_Stop) {

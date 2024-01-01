@@ -154,6 +154,10 @@ class Lobby extends MusicBeatState {
 		FlxG.mouse.visible = true;
 
 		changeSelection(0);
+
+		#if mobileC
+		addVirtualPad(UP_DOWN, A_B);
+		#end
     }
 
 	override function destroy() {
@@ -177,6 +181,7 @@ class Lobby extends MusicBeatState {
 
         if (disableInput) return;
 
+		#if desktop
 		var mouseInItems = FlxG.mouse.y > items.y && FlxG.mouse.y < items.y + items.members.length * 40;
 
 		if (FlxG.mouse.justPressed && inputWait && mouseInItems) {
@@ -192,17 +197,17 @@ class Lobby extends MusicBeatState {
 			curSelected = Std.int((FlxG.mouse.y - (items.y)) / 40);
 			changeSelection(0);
 		}
-
+		#end
 		if (!inputWait) {
 			if (controls.UI_UP_P)
 				changeSelection(-1);
 			else if (controls.UI_DOWN_P)
 				changeSelection(1);
 
-			if (controls.ACCEPT || (FlxG.mouse.justPressed && mouseInItems)) {
+			if (controls.ACCEPT #if desktop || (FlxG.mouse.justPressed && mouseInItems)#end) {
 				switch (itms[curSelected].toLowerCase()) {
 					case "join":
-						inputWait = true;
+						inputWait = FlxG.stage.window.textInputEnabled = true;
 					case "find":
 						// FlxG.openURL(GameClient.serverAddress + "/rooms");
 						FlxG.switchState(new FindRoom());
@@ -216,7 +221,7 @@ class Lobby extends MusicBeatState {
 						FlxG.openURL("https://github.com/Snirozu/Funkin-Psych-Online/wiki");
 				}
 				if (curSelected == 3 || curSelected == 4) {
-					inputWait = true;
+					inputWait = FlxG.stage.window.textInputEnabled = true;
 				}
 			}
 
@@ -232,6 +237,11 @@ class Lobby extends MusicBeatState {
 				GameClient.joinRoom(Clipboard.text, onRoomJoin);
 			}
 		}
+		#if android
+		if(FlxG.android.justReleased.BACK && inputWait){
+			inputWait = FlxG.stage.window.textInputEnabled = false;
+		}
+		#end
     }
 	
 	function changeSelection(diffe:Int) {

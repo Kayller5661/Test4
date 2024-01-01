@@ -14,6 +14,9 @@ import states.MainMenuState;
 import online.schema.RoomState;
 import io.colyseus.Client;
 import io.colyseus.Room;
+#if (target.threaded)
+import sys.thread.Thread;
+#end
 
 class GameClient {
     public static var client:Client;
@@ -24,8 +27,8 @@ class GameClient {
 	public static var serverAddress(get, set):String;
 
     public static function createRoom(?onJoin:()->Void) {
+		#if (target.threaded) Thread.create(() -> {#end
 		client = new Client(serverAddress);
-
 		client.create("room", ["name" => ClientPrefs.data.nickname, "version" => MainMenuState.psychOnlineVersion], RoomState, function(err, room) {
             if (err != null) {
 				Alert.alert("Couldn't connect!", "ERROR: " + err.code + " - " + err.message + (err.code == 0 ? "\nTry again in a few minutes! The server is probably restarting!" : ""));
@@ -57,11 +60,12 @@ class GameClient {
 
 			onJoin();
         });
+		#if (target.threaded) }); #end
     }
 
     public static function joinRoom(roomID:String, ?onJoin:()->Void) {
+		#if (target.threaded) Thread.create(() -> {#end
 		client = new Client(serverAddress);
-
 		client.joinById(roomID, ["name" => ClientPrefs.data.nickname, "version" => MainMenuState.psychOnlineVersion], RoomState, function(err, room) {
             if (err != null) {
 				Alert.alert("Couldn't connect!", "JOIN ERROR: " + err.code + " - " + err.message);
@@ -93,9 +97,11 @@ class GameClient {
 
 			onJoin();
         });
+		#if (target.threaded) }); #end
     }
 
 	public static function reconnect(?nextTry:Bool = false) {
+		#if (target.threaded) Thread.create(() -> {#end
 		leaveRoom();
 		Alert.alert("Disconnected!");
 		return;
@@ -142,6 +148,7 @@ class GameClient {
 
 			reconnectTries = 0;
 		});
+		#if (target.threaded) }); #end
 	}
 
 	public static function getAvailableRooms(result:(MatchMakeError, Array<RoomAvailable>)->Void) {

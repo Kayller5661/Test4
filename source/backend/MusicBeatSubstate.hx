@@ -8,6 +8,7 @@ class MusicBeatSubstate extends FlxSubState
 
 	public function new()
 	{
+		#if mobileC controls.isInSubstate = false; #end
 		instance = this;
 		super();
 	}
@@ -28,32 +29,24 @@ class MusicBeatSubstate extends FlxSubState
 	inline function get_controls():Controls
 		return Controls.instance;
 
+	#if mobileC
 	public var virtualPad:FlxVirtualPad;
 	public var mobileControls:MobileControls;
 	public var camControls:FlxCamera;
 	public var vpadCam:FlxCamera;
-	private static var curFlxDPadMode:FlxDPadMode;
-	private static var curFlxActionMode:FlxActionMode;
 
-	public function addVirtualPad(DPad:FlxDPadMode, Action:FlxActionMode)
-		{
-			curFlxDPadMode = DPad;
-			curFlxActionMode = Action;
-			virtualPad = new FlxVirtualPad(DPad, Action);
-			virtualPad.alpha = ClientPrefs.data.controlsAlpha;
-			add(virtualPad);
-		}
-	
-	public function removeVirtualPad(full:Bool = true){
-		if (virtualPad != null)
-			remove(virtualPad);
-		if(full){
-			curFlxDPadMode = null;
-			curFlxActionMode = null;
-		}
+	public function addVirtualPad(DPad:FlxDPadMode, Action:FlxActionMode) {
+		virtualPad = new FlxVirtualPad(DPad, Action);
+		virtualPad.alpha = ClientPrefs.data.controlsAlpha;
+		add(virtualPad);
 	}
 	
-	public function addMobileControls(DefaultDrawTarget:Bool = true):Void
+	public function removeVirtualPad(){
+		if (virtualPad != null)
+			remove(virtualPad);
+	}
+	
+	public function addMobileControls(DefaultDrawTarget:Bool = true)
 	{
 		mobileControls = new MobileControls();
 
@@ -73,7 +66,7 @@ class MusicBeatSubstate extends FlxSubState
 			remove(mobileControls);
 	}
 	
-	public function addVirtualPadCamera(DefaultDrawTarget:Bool = true):Void
+	public function addVirtualPadCamera(DefaultDrawTarget:Bool = true)
 	{
 		if (virtualPad != null)
 		{
@@ -99,7 +92,9 @@ class MusicBeatSubstate extends FlxSubState
 			mobileControls = FlxDestroyUtil.destroy(mobileControls);
 			mobileControls = null;
 		}
+		controls.isInSubstate = false;
 	}
+	#end
 
 	override function update(elapsed:Float)
 	{

@@ -3,6 +3,8 @@ package backend;
 import flixel.addons.ui.FlxUIState;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.FlxState;
+import flixel.FlxSubState;
+
 
 class MusicBeatState extends FlxUIState
 {
@@ -24,33 +26,24 @@ class MusicBeatState extends FlxUIState
 
 	public static var camBeat:FlxCamera;
 
+	#if mobileC
 	public var virtualPad:FlxVirtualPad;
 	public var mobileControls:MobileControls;
 	public var camControls:FlxCamera;
 	public var vpadCam:FlxCamera;
-	private static var curFlxDPadMode:FlxDPadMode;
-	private static var curFlxActionMode:FlxActionMode;
 
-	public function addVirtualPad(DPad:FlxDPadMode, Action:FlxActionMode)
-		{
-			curFlxDPadMode = DPad;
-			curFlxActionMode = Action;
-			virtualPad = new FlxVirtualPad(DPad, Action);
-			virtualPad.alpha = ClientPrefs.data.controlsAlpha;
-			add(virtualPad);
-		}
-	
-	public function removeVirtualPad(full:Bool = true){
-		if (virtualPad != null)
-			remove(virtualPad);
-		if(full){
-			curFlxDPadMode = null;
-			curFlxActionMode = null;
-		}
+	public function addVirtualPad(DPad:FlxDPadMode, Action:FlxActionMode){
+		virtualPad = new FlxVirtualPad(DPad, Action);
+		virtualPad.alpha = ClientPrefs.data.controlsAlpha;
+		add(virtualPad);
 	}
 	
-	public function addMobileControls(DefaultDrawTarget:Bool = true):Void
-	{
+	public function removeVirtualPad(){
+		if (virtualPad != null)
+			remove(virtualPad);
+	}
+	
+	public function addMobileControls(DefaultDrawTarget:Bool = true) {
 		mobileControls = new MobileControls();
 
 		camControls = new FlxCamera();
@@ -63,16 +56,13 @@ class MusicBeatState extends FlxUIState
 		add(mobileControls);
 	}
 
-	public function removeMobileControls()
-	{
-		if (mobileControls != null)
+	public function removeMobileControls() {
+		if(mobileControls != null)
 			remove(mobileControls);
 	}
 	
-	public function addVirtualPadCamera(DefaultDrawTarget:Bool = true):Void
-	{
-		if (virtualPad != null)
-		{
+	public function addVirtualPadCamera(DefaultDrawTarget:Bool = true) {
+		if (virtualPad != null) {
 			vpadCam = new FlxCamera();
 			vpadCam.bgColor.alpha = 0;
 			FlxG.cameras.add(vpadCam, DefaultDrawTarget);
@@ -80,22 +70,20 @@ class MusicBeatState extends FlxUIState
 		}
 	}
 	
-	override function destroy()
-	{
+	override function destroy() {
 		super.destroy();
 
-		if (virtualPad != null)
-		{
+		if(virtualPad != null) {
 			virtualPad = FlxDestroyUtil.destroy(virtualPad);
 			virtualPad = null;
 		}
 	
-		if (mobileControls != null)
-		{
+		if(mobileControls != null) {
 			mobileControls = FlxDestroyUtil.destroy(mobileControls);
 			mobileControls = null;
 		}
 	}
+	#end
 
 	override function create() {
 		instance = this;

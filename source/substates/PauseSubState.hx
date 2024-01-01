@@ -140,12 +140,22 @@ class PauseSubState extends MusicBeatSubstate
 
 		regenMenu();
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
+		#if mobileC
+		addVirtualPad(PlayState.chartingMode ? LEFT_FULL : UP_DOWN, A);
+		addVirtualPadCamera(false);
+		#end
 	}
 
 	var holdTime:Float = 0;
 	var cantUnpause:Float = 0.1;
 	override function update(elapsed:Float)
 	{
+		#if mobileC
+		if(virtualPad == null) {
+			addVirtualPad(PlayState.chartingMode ? LEFT_FULL : UP_DOWN, A);
+			addVirtualPadCamera(false);
+		}
+		#end
 		cantUnpause -= elapsed;
 		if (pauseMusic.volume < 0.5)
 			pauseMusic.volume += 0.01 * elapsed;

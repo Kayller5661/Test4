@@ -104,6 +104,8 @@ class TitleState extends MusicBeatState
 
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
+		#if mobileC controls.isInSubstate = false; #end
+
 		super.create();
 
 		FlxG.save.bind('funkin', CoolUtil.getSavePath());
@@ -186,7 +188,7 @@ class TitleState extends MusicBeatState
 		#elseif CHARTING
 		MusicBeatState.switchState(new ChartingState());
 		#else
-		if(CopyState.checkExistingFiles() && FlxG.save.data.flashing == null && !FlashingState.leftState) {
+		if(#if mobile CopyState.checkExistingFiles() && #end FlxG.save.data.flashing == null && !FlashingState.leftState) {
 			FlxTransitionableState.skipNextTransIn = true;
 			FlxTransitionableState.skipNextTransOut = true;
 			MusicBeatState.switchState(new FlashingState());

@@ -356,7 +356,7 @@ class Room extends MusicBeatState {
 				item.scale.set(FlxMath.lerp(item.scale.x, 1, elapsed * 10), FlxMath.lerp(item.scale.y, 1, elapsed * 10));
 			}
 		}
-
+		#if desktop
 		if (!chatBox.focused) {
 			if (FlxG.mouse.justMoved) {
 				if (mouseInsideOf(settingsIconBg)) {
@@ -381,6 +381,7 @@ class Room extends MusicBeatState {
 					curSelected = -1;
 				}
 			}
+			#end
 
 			if (controls.UI_LEFT_P) {
 				changeSelection(1);
@@ -642,13 +643,13 @@ class Room extends MusicBeatState {
 			Conductor.bpm = 102;
 		}
 	}
-
+	#if desktop
 	function mouseInsideOf(object:FlxObject) {
 		return 
 			FlxG.mouse.x >= object.x && FlxG.mouse.x <= object.x + object.width &&
-			FlxG.mouse.y >= object.y && FlxG.mouse.y <= object.y + object.height
-		;
+			FlxG.mouse.y >= object.y && FlxG.mouse.y <= object.y + object.height;
 	}
+	#end
 
 	function playerAnim(anim:String, incoming:Bool) {
 		if (!GameClient.isOwner) {
