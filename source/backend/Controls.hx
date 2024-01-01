@@ -336,7 +336,7 @@ class Controls
 	public static var instance:Controls;
 	public function new()
 	{
-		#if mobileC mobileBinds = ClientPrefs.defaultMobileBinds; #end
+		#if mobileC mobileBinds = ClientPrefs.mobileBinds; #end
 		gamepadBinds = ClientPrefs.gamepadBinds;
 		keyboardBinds = ClientPrefs.keyBinds;
 	}

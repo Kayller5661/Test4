@@ -5,7 +5,7 @@ import backend.StageData;
 
 class OptionsState extends MusicBeatState
 {
-	var options:Array<String> = ['Note Colors', 'Controls', 'Adjust Delay and Combo', 'Graphics', 'Visuals and UI', 'Gameplay'];
+	var options:Array<String> = ['Note Colors', 'Controls', 'Adjust Delay and Combo', 'Graphics', 'Visuals and UI', 'Gameplay' #if mobileC , 'Mobile Options' #end];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private static var curSelected:Int = 0;
 	public static var menuBG:FlxSprite;
@@ -25,6 +25,10 @@ class OptionsState extends MusicBeatState
 				openSubState(new options.GameplaySettingsSubState());
 			case 'Adjust Delay and Combo':
 				MusicBeatState.switchState(new options.NoteOffsetState());
+			#if mobileC
+			case 'Mobile Options':
+				openSubState(new options.MobileOptionsSubState());
+			#end
 		}
 	}
 
@@ -63,16 +67,30 @@ class OptionsState extends MusicBeatState
 		changeSelection();
 		ClientPrefs.saveSettings();
 
+		#if mobileC
+		addVirtualPad(LEFT_FULL, A_B_C);
+		#end
+
 		super.create();
 	}
 
 	override function closeSubState() {
-		super.closeSubState();
 		ClientPrefs.saveSettings();
+		#if mobileC
+		removeVirtualPad();
+		addVirtualPad(LEFT_FULL, A_B_C);
+		controls.isInSubstate = false;
+		#end
+		super.closeSubState();
 	}
 
 	override function update(elapsed:Float) {
 		super.update(elapsed);
+
+		#if mobileC
+		if(virtualPad.buttonC.justPressed)
+			openSubState(new MobileControlsSubState());
+		#end
 
 		if (controls.UI_UP_P) {
 			changeSelection(-1);

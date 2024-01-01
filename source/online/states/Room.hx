@@ -356,8 +356,8 @@ class Room extends MusicBeatState {
 				item.scale.set(FlxMath.lerp(item.scale.x, 1, elapsed * 10), FlxMath.lerp(item.scale.y, 1, elapsed * 10));
 			}
 		}
-		#if desktop
 		if (!chatBox.focused) {
+			#if desktop
 			if (FlxG.mouse.justMoved) {
 				if (mouseInsideOf(settingsIconBg)) {
 					curSelected = settingsIcon.ID;

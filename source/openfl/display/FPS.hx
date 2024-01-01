@@ -1,7 +1,5 @@
 package openfl.display;
 
-import haxe.Timer;
-import openfl.events.Event;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 #if gl_stats
@@ -45,7 +43,11 @@ class FPS extends TextField
 		currentFPS = 0;
 		selectable = false;
 		mouseEnabled = false;
+		#if mobile
+        defaultTextFormat = new TextFormat('_sans', Std.int(14 * Math.min(openfl.Lib.current.stage.stageWidth / FlxG.width, openfl.Lib.current.stage.stageHeight / FlxG.height)), color);
+        #else
 		defaultTextFormat = new TextFormat("_sans", 14, color);
+        #end
 		autoSize = LEFT;
 		multiline = true;
 		text = "FPS: ";
@@ -81,27 +83,16 @@ class FPS extends TextField
 
 		if (currentCount != cacheCount /*&& visible*/)
 		{
-			text = "FPS: " + currentFPS;
-			var memoryMegas:Float = 0;
-			
-			#if openfl
-			memoryMegas = Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 1));
-			text += "\nMemory: " + memoryMegas + " MB";
-			#end
+			var memoryMegas:Float = Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 1));
+			text = 'FPS: $currentFPS' +
+				'\nMemory: $memoryMegas MB' +
+				'\nPlatform: ${lime.system.System.platformLabel}';
 
 			textColor = 0xFFFFFFFF;
 			if (memoryMegas > 3000 || currentFPS <= ClientPrefs.data.framerate / 2)
 			{
 				textColor = 0xFFFF0000;
 			}
-
-			#if (gl_stats && !disable_cffi && (!html5 || !canvas))
-			text += "\ntotalDC: " + Context3DStats.totalDrawCalls();
-			text += "\nstageDC: " + Context3DStats.contextDrawCalls(DrawCallContext.STAGE);
-			text += "\nstage3DDC: " + Context3DStats.contextDrawCalls(DrawCallContext.STAGE3D);
-			#end
-
-			text += "\n";
 		}
 
 		cacheCount = currentCount;
