@@ -85,7 +85,16 @@ class TitleState extends MusicBeatState
 		Paths.clearUnusedMemory();
 
 		#if LUA_ALLOWED
+        	#if (android && EXTERNAL || MEDIA)
+        try {
+        	#end
 		Mods.pushGlobalMods();
+            #if (android && EXTERNAL || MEDIA)
+        } catch (e:Dynamic) {
+            FlxG.stage.application.window.alert("Please create folder to\n" + #if EXTERNAL "/storage/emulated/0/.PsychEngineOnline" #else "/storage/emulated/0/Android/media/com.snirozu.psychengine" #end + "\nPress OK to close the game", "Error!");
+            Sys.exit(1);
+        }
+            #end
 		#end
 		Mods.loadTopMod();
 
