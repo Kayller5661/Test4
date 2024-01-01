@@ -195,8 +195,8 @@ class ChatMessage extends FlxText {
 		var _split = message.split("");
 		var i = -1;
 		var str = "";
-		var formatBeg = null;
-		var formatEnd = null;
+		var formatBeg:Int = 0;
+		var formatEnd:Int = 0;
 		while (++i < message.length) {
 			if (this.link == null && str.startsWith("https://")) {
 				if (_split[i].trim() == "") {

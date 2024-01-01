@@ -20,6 +20,9 @@ import shaders.ColorSwap;
 import states.StoryMenuState;
 import states.OutdatedState;
 import states.MainMenuState;
+#if mobile
+import mobile.states.CopyState;
+#end
 
 #if MODS_ALLOWED
 import sys.FileSystem;
@@ -74,6 +77,7 @@ class TitleState extends MusicBeatState
 	var titleJSON:TitleData;
 
 	public static var updateVersion:String = '';
+	public static var ignoreCopy:Bool = false;
 
 	override public function create():Void
 	{
@@ -96,6 +100,11 @@ class TitleState extends MusicBeatState
 		FlxG.save.bind('funkin', CoolUtil.getSavePath());
 
 		ClientPrefs.loadPrefs();
+
+		#if mobile
+		if(!CopyState.checkExistingFiles() && !ignoreCopy)
+			FlxG.switchState(new CopyState());
+		#end
 
 		#if CHECK_FOR_UPDATES
 		if(ClientPrefs.data.checkForUpdates && !closedState) {
@@ -168,7 +177,7 @@ class TitleState extends MusicBeatState
 		#elseif CHARTING
 		MusicBeatState.switchState(new ChartingState());
 		#else
-		if(FlxG.save.data.flashing == null && !FlashingState.leftState) {
+		if(CopyState.checkExistingFiles() && FlxG.save.data.flashing == null && !FlashingState.leftState) {
 			FlxTransitionableState.skipNextTransIn = true;
 			FlxTransitionableState.skipNextTransOut = true;
 			MusicBeatState.switchState(new FlashingState());

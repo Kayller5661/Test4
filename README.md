@@ -1,4 +1,4 @@
-# Psych Engine - Online
+# Psych Engine Mobile - Online
 Modified version of Psych Engine that adds multiplayer to it.
 
 This engine also has a [wiki!](https://github.com/Snirozu/Funkin-Psych-Online/wiki)

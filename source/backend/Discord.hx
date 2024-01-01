@@ -1,13 +1,14 @@
 package backend;
-
+#if desktop
 import Sys.sleep;
 import discord_rpc.DiscordRpc;
 import lime.app.Application;
-
+#end
 class DiscordClient
 {
 	public static var isInitialized:Bool = false;
 	private static var _defaultID:String = "1185697129717583982";
+	#if desktop
 	public static var clientID(default, set):String = _defaultID;
 
 	private static var _options:Dynamic = {
@@ -19,9 +20,11 @@ class DiscordClient
 		startTimestamp : null,
 		endTimestamp : null
 	};
+	#end
 
 	public function new()
 	{
+		#if desktop
 		trace("Discord Client starting...");
 		DiscordRpc.start({
 			clientID: clientID,
@@ -40,38 +43,48 @@ class DiscordClient
 		}
 
 		//DiscordRpc.shutdown();
+		#end
 	}
 
 	public static function check()
 	{
+		#if desktop
 		if(!ClientPrefs.data.discordRPC)
 		{
 			if(isInitialized) shutdown();
 			isInitialized = false;
 		}
 		else start();
+		#end
 	}
 	
 	public static function start()
 	{
+		#if desktop
+
 		if (!isInitialized && ClientPrefs.data.discordRPC) {
 			initialize();
 			Application.current.window.onClose.add(function() {
 				shutdown();
 			});
 		}
+		#end
 	}
-
+		
 	public static function shutdown()
 	{
+		#if desktop
 		DiscordRpc.shutdown();
+		#end
 	}
-	
+			
 	static function onReady()
 	{
+		#if desktop
 		DiscordRpc.presence(_options);
+		#end
 	}
-
+	#if desktop
 	private static function set_clientID(newID:String)
 	{
 		var change:Bool = (clientID != newID);
@@ -86,6 +99,7 @@ class DiscordClient
 		}
 		return newID;
 	}
+	#end
 
 	static function onError(_code:Int, _message:String)
 	{
@@ -99,17 +113,19 @@ class DiscordClient
 
 	public static function initialize()
 	{
-		
+		#if desktop
 		var DiscordDaemon = sys.thread.Thread.create(() ->
 		{
 			new DiscordClient();
 		});
 		trace("Discord Client initialized");
 		isInitialized = true;
+		#end
 	}
 
 	public static function changePresence(details:String, state:Null<String>, ?smallImageKey : String, ?hasStartTimestamp : Bool, ?endTimestamp: Float)
 	{
+		#if desktop
 		var startTimestamp:Float = 0;
 		if (hasStartTimestamp) startTimestamp = Date.now().getTime();
 		if (endTimestamp > 0) endTimestamp = startTimestamp + endTimestamp;
@@ -125,25 +141,30 @@ class DiscordClient
 		DiscordRpc.presence(_options);
 
 		//trace('Discord RPC Updated. Arguments: $details, $state, $smallImageKey, $hasStartTimestamp, $endTimestamp');
+		#end
 	}
 	
-	public static function resetClientID()
-		clientID = _defaultID;
+	public static function resetClientID(){
+	#if desktop	clientID = _defaultID; #end
+	}
 
 	#if MODS_ALLOWED
 	public static function loadModRPC()
 	{
+		#if desktop
 		var pack:Dynamic = Mods.getPack();
 		if(pack != null && pack.discordRPC != null && pack.discordRPC != clientID)
 		{
 			clientID = pack.discordRPC;
 			//trace('Changing clientID! $clientID, $_defaultID');
 		}
+		#end
 	}
 	#end
 
 	#if LUA_ALLOWED
 	public static function addLuaCallbacks(lua:State) {
+		#if desktop
 		Lua_helper.add_callback(lua, "changeDiscordPresence", function(details:String, state:Null<String>, ?smallImageKey:String, ?hasStartTimestamp:Bool, ?endTimestamp:Float) {
 			changePresence(details, state, smallImageKey, hasStartTimestamp, endTimestamp);
 		});
@@ -152,6 +173,7 @@ class DiscordClient
 			if(newID == null) newID = _defaultID;
 			clientID = newID;
 		});
+		#end
 	}
 	#end
 }

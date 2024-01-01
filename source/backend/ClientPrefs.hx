@@ -8,6 +8,10 @@ import states.TitleState;
 
 // Add a variable here and it will get automatically saved
 class SaveVariables {
+	public var extraButtons:String = "NONE"; // mobile extra button option
+	public var hitbox2:Bool = true; // hitbox extra button position option
+	public var dynamicColors:Bool = true; // yes cause its cool -Karim
+	public var controlsAlpha:Float = #if (mobile || mobileC) 0.6 #else 0.001 #end;
 	public var downScroll:Bool = false;
 	public var middleScroll:Bool = false;
 	public var opponentStrums:Bool = true;
@@ -128,6 +132,23 @@ class ClientPrefs {
 		'pause'			=> [START],
 		'reset'			=> [BACK]
 	];
+	public static var mobileBinds:Map<String, Array<FlxMobileInputID>> = [
+		'note_up'		=> [noteUP, UP2],
+		'note_left'		=> [noteLEFT, LEFT2],
+		'note_down'		=> [noteDOWN, DOWN2],
+		'note_right'	=> [noteRIGHT, RIGHT2],
+
+		'ui_up'			=> [UP, noteUP],
+		'ui_left'		=> [LEFT, noteLEFT],
+		'ui_down'		=> [DOWN, noteDOWN],
+		'ui_right'		=> [RIGHT, noteRIGHT],
+
+		'accept'		=> [A],
+		'back'			=> [B],
+		'pause'			=> [#if android NONE #else P #end],
+		'reset'			=> [NONE]
+	];
+	public static var defaultMobileBinds:Map<String, Array<FlxMobileInputID>> = null;
 	public static var defaultKeys:Map<String, Array<FlxKey>> = null;
 	public static var defaultButtons:Map<String, Array<FlxGamepadInputID>> = null;
 
@@ -154,13 +175,16 @@ class ClientPrefs {
 	public static function clearInvalidKeys(key:String) {
 		var keyBind:Array<FlxKey> = keyBinds.get(key);
 		var gamepadBind:Array<FlxGamepadInputID> = gamepadBinds.get(key);
+		var mobileBind:Array<FlxMobileInputID> = mobileBinds.get(key);
 		while(keyBind != null && keyBind.contains(NONE)) keyBind.remove(NONE);
 		while(gamepadBind != null && gamepadBind.contains(NONE)) gamepadBind.remove(NONE);
+		while(mobileBind != null && mobileBind.contains(NONE)) mobileBind.remove(NONE);
 	}
 
 	public static function loadDefaultKeys() {
 		defaultKeys = keyBinds.copy();
 		defaultButtons = gamepadBinds.copy();
+		defaultMobileBinds = mobileBinds.copy();
 	}
 
 	public static function saveSettings() {
@@ -177,6 +201,7 @@ class ClientPrefs {
 		save.bind('controls_v3', CoolUtil.getSavePath());
 		save.data.keyboard = keyBinds;
 		save.data.gamepad = gamepadBinds;
+		save.data.mobile = mobileBinds;
 		save.flush();
 		FlxG.log.add("Settings saved!");
 	}
@@ -240,6 +265,11 @@ class ClientPrefs {
 				for (control => keys in loadedControls) {
 					if(gamepadBinds.exists(control)) gamepadBinds.set(control, keys);
 				}
+			}
+			if(save.data.mobile != null) {
+				var loadedControls:Map<String, Array<FlxMobileInputID>> = save.data.mobile;
+				for (control => keys in loadedControls)
+					if(mobileBinds.exists(control)) mobileBinds.set(control, keys);
 			}
 			reloadVolumeKeys();
 		}

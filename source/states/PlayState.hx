@@ -59,10 +59,7 @@ import sys.io.File;
 #end
 
 #if VIDEOS_ALLOWED 
-#if (hxCodec >= "3.0.0") import hxcodec.flixel.FlxVideo as VideoHandler;
-#elseif (hxCodec >= "2.6.1") import hxcodec.VideoHandler as VideoHandler;
-#elseif (hxCodec == "2.6.0") import VideoHandler;
-#else import vlc.MP4Handler as VideoHandler; #end
+import backend.VideoManager;
 #end
 
 import objects.Note.EventNote;
@@ -907,44 +904,27 @@ class PlayState extends MusicBeatState
 		char.y += char.positionArray[1];
 	}
 
-	public function startVideo(name:String)
+	public function startVideo(name:String) #if VIDEOS_ALLOWED :VideoManager#end
 	{
 		#if VIDEOS_ALLOWED
-		inCutscene = true;
-
 		var filepath:String = Paths.video(name);
-		#if sys
-		if(!FileSystem.exists(filepath))
-		#else
-		if(!OpenFlAssets.exists(filepath))
-		#end
-		{
+		var video:VideoManager = new VideoManager();
+		inCutscene = true;
+		if(#if MODS_ALLOWED !FileSystem.exists(filepath) #else !Assets.exists(filepath) #end) {
 			FlxG.log.warn('Couldnt find video file: ' + name);
 			startAndEnd();
-			return;
+			return null;
 		}
-
-		var video:VideoHandler = new VideoHandler();
-			#if (hxCodec >= "3.0.0")
-			// Recent versions
-			video.play(filepath);
-			video.onEndReached.add(function()
-			{
-				video.dispose();
-				startAndEnd();
-				return;
-			}, true);
-			#else
-			// Older versions
-			video.playVideo(filepath);
-			video.finishCallback = function()
-			{
-				startAndEnd();
-				return;
-			}
-			#end
+	
+		video.startVideo(filepath);
+		video.onVideoEnd.add(function(){
+			startAndEnd();
+			return;
+		});
+	
+		return video;
 		#else
-		FlxG.log.warn('Platform not supported!');
+		FlxG.log.warn('Platform not supported for video play back!');
 		startAndEnd();
 		return;
 		#end

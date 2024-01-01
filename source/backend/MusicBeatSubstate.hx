@@ -4,8 +4,11 @@ import flixel.FlxSubState;
 
 class MusicBeatSubstate extends FlxSubState
 {
+	public static var instance:MusicBeatSubstate;
+
 	public function new()
 	{
+		instance = this;
 		super();
 	}
 
@@ -24,6 +27,79 @@ class MusicBeatSubstate extends FlxSubState
 
 	inline function get_controls():Controls
 		return Controls.instance;
+
+	public var virtualPad:FlxVirtualPad;
+	public var mobileControls:MobileControls;
+	public var camControls:FlxCamera;
+	public var vpadCam:FlxCamera;
+	private static var curFlxDPadMode:FlxDPadMode;
+	private static var curFlxActionMode:FlxActionMode;
+
+	public function addVirtualPad(DPad:FlxDPadMode, Action:FlxActionMode)
+		{
+			curFlxDPadMode = DPad;
+			curFlxActionMode = Action;
+			virtualPad = new FlxVirtualPad(DPad, Action);
+			virtualPad.alpha = ClientPrefs.data.controlsAlpha;
+			add(virtualPad);
+		}
+	
+	public function removeVirtualPad(full:Bool = true){
+		if (virtualPad != null)
+			remove(virtualPad);
+		if(full){
+			curFlxDPadMode = null;
+			curFlxActionMode = null;
+		}
+	}
+	
+	public function addMobileControls(DefaultDrawTarget:Bool = true):Void
+	{
+		mobileControls = new MobileControls();
+
+		camControls = new FlxCamera();
+		camControls.bgColor.alpha = 0;
+		FlxG.cameras.add(camControls, DefaultDrawTarget);
+
+		mobileControls.cameras = [camControls];
+		mobileControls.visible = false;
+		mobileControls.alpha = ClientPrefs.data.controlsAlpha;
+		add(mobileControls);
+	}
+
+	public function removeMobileControls()
+	{
+		if (mobileControls != null)
+			remove(mobileControls);
+	}
+	
+	public function addVirtualPadCamera(DefaultDrawTarget:Bool = true):Void
+	{
+		if (virtualPad != null)
+		{
+			vpadCam = new FlxCamera();
+			vpadCam.bgColor.alpha = 0;
+			FlxG.cameras.add(vpadCam, DefaultDrawTarget);
+			virtualPad.cameras = [vpadCam];
+		}
+	}
+	
+	override function destroy()
+	{
+		super.destroy();
+
+		if (virtualPad != null)
+		{
+			virtualPad = FlxDestroyUtil.destroy(virtualPad);
+			virtualPad = null;
+		}
+	
+		if (mobileControls != null)
+		{
+			mobileControls = FlxDestroyUtil.destroy(mobileControls);
+			mobileControls = null;
+		}
+	}
 
 	override function update(elapsed:Float)
 	{
