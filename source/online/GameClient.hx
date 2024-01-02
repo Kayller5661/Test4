@@ -1,6 +1,5 @@
 package online;
 
-import sys.thread.Thread;
 import backend.Rating;
 import online.schema.Player;
 import haxe.Http;
