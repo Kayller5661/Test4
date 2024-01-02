@@ -1,6 +1,5 @@
 package online.states;
 
-import flixel.FlxSubState;
 import flixel.math.FlxPoint;
 import flixel.FlxObject;
 import flixel.util.FlxSpriteUtil;
@@ -145,7 +144,7 @@ class Room extends MusicBeatState {
 		settingsIcon.y += settingsIconBg.height / 2 - settingsIcon.height / 2;
 		settingsIcon.ID = 0;
 		items.add(settingsIcon);
-		#if !mobile
+
 		chatIconBg = new FlxSprite();
 		chatIconBg.makeGraphic(100, 100, 0x5D000000);
 		chatIconBg.updateHitbox();
@@ -163,13 +162,12 @@ class Room extends MusicBeatState {
 		chatIcon.y += chatIconBg.height / 2 - chatIcon.height / 2;
 		chatIcon.ID = 1;
 		items.add(chatIcon);
-		#end
 
 		playIconBg = new FlxSprite();
 		playIconBg.makeGraphic(100, 100, 0x5D000000);
 		playIconBg.updateHitbox();
-		playIconBg.y = #if mobile settingsIconBg.y #else chatIconBg.y #end;
-		playIconBg.x = #if mobile settingsIconBg.x - chatIconBg.width - 20 #else chatIconBg.x - playIconBg.width - 20 #end;
+		playIconBg.y = chatIconBg.y;
+		playIconBg.x = chatIconBg.x - playIconBg.width - 20;
 		add(playIconBg);
 
 		playIcon = new FlxSprite(playIconBg.x, playIconBg.y);
@@ -326,14 +324,32 @@ class Room extends MusicBeatState {
 
 		FlxG.mouse.visible = true;
 		#if mobileC
-		addVirtualPad(LEFT_FULL, A_B);
-		virtualPad.y = FlxG.height / 2;
-		#end
+        addVirtualPad(LEFT_FULL, A_B);
+        virtualPad.buttonA.y = virtualPad.buttonB.y -= 305;
+        virtualPad.alpha = 0.45;
+        #end
 	}
 
 	var elapsedShit = 0.;
     override function update(elapsed:Float) {
 		elapsedShit += elapsed;
+
+		#if mobileC
+        virtualPad.forEachAlive(function(button:mobile.flixel.FlxButton){
+            var buttons = ['LEFT', 'DOWN', 'UP', 'RIGHT'];
+            if(buttons.contains(button.tag)){
+                if(chatBox.focused)
+                    button.visible = false;
+                else if(!chatBox.focused)
+                    button.visible = true;
+            }
+        });
+        #end
+
+		#if android
+		if(FlxG.android.justReleased.BACK)
+			chatBox.focused = false;
+		#end
 
 		if (elapsedShit >= 3) {
 			elapsedShit = 0;
@@ -349,9 +365,8 @@ class Room extends MusicBeatState {
 			if (curSelected == item.ID) {
 				if (item == settingsIcon)
 					item.angle += 20 * elapsed;
-				#if !mobile else if (item == chatIcon)
+				else if (item == chatIcon)
 					item.angle = FlxMath.lerp(item.angle, 20, elapsed * 5);
-				#end
 
 				if (item != playIcon)
 					item.scale.set(FlxMath.lerp(item.scale.x, 1.1, elapsed * 10), FlxMath.lerp(item.scale.y, 1.1, elapsed * 10));
@@ -406,7 +421,6 @@ class Room extends MusicBeatState {
 			if (controls.ACCEPT #if desktop || FlxG.mouse.justPressed #end) {
 				switch (curSelected) {
 					case 0:
-						#if mobileC virtualPad.visible = false; #end
 						openSubState(new ServerSettingsSubstate());
 					case 1:
 						chatBox.focused = true;
@@ -605,17 +619,15 @@ class Room extends MusicBeatState {
 		switch (curSelected) {
 			case 0:
 				itemTip.text = " - SETTINGS - \nOpens server settings." #if desktop + "\n\n(Keybind: SHIFT)" #end;
-			#if !mobile
 			case 1:
-				itemTip.text = " - CHAT - \nOpens chat.\n\n(Keybind: TAB)";
-			#end
-			case #if mobile 1 #else 2 #end:
+				itemTip.text = " - CHAT - \nOpens chat." #if desktop + "\n\n(Keybind: TAB)" #end;
+			case 2:
 				itemTip.text = " - START GAME/READY - \nToggles your READY status.\nPlayers need to have the currently\nselected mod installed.\nAll players should also be ready to start.";
-			case #if mobile 2 #else 3 #end:
+			case 3:
 				itemTip.text = " - ROOM CODE - \nUnique code of this room.\n\nACCEPT - Reveals the code." #if desktop + "\nCTRL + C - Copies it without revealing."#end;
-			case #if mobile 3 #else 4 #end:
+			case 4:
 				itemTip.text = " - SELECT SONG - \nSelects the song.\n\n(Players with host permissions\ncan only do that)";
-			case #if mobile 4 #else 5 #end:
+			case 5:
 				itemTip.text = " - VERIFY MOD - \nDownloads the currently selected mod\nif it isn't installed.\n\nAfter you install it\npress this button again!";
 			default:
 				itemTip.text = #if mobileC " - LOBBY - \nPress UI button\nto select an option!" #else " - LOBBY - \nPress UI keybinds\nor use your mouse\nto select an option!" #end;
@@ -684,11 +696,11 @@ class Room extends MusicBeatState {
 	}
 
 	#if mobileC
-	override function closeSubState() {
-		super.closeSubState();
-		removeVirtualPad();
-		addVirtualPad(LEFT_FULL, A_B);
-		virtualPad.y = FlxG.height / 2;
-	}
-	#end
+    override function closeSubState() {
+        super.closeSubState();
+        removeVirtualPad();
+        addVirtualPad(LEFT_FULL, A_B);
+        virtualPad.buttonA.y = virtualPad.buttonB.y -= 305;
+    }
+    #end
 }

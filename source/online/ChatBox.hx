@@ -12,11 +12,13 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
 	var prevMouseVisibility:Bool = false;
 
     public var focused(default, set):Bool = false;
+	public var typing:Bool = false;
 	function set_focused(v) {
 		if (v) {
 			prevMouseVisibility = FlxG.mouse.visible;
 			FlxG.mouse.visible = true;
-			typeTextHint.text = #if mobile "" #else "(Type something to input the message, ACCEPT to send)" #end;
+			var shit = #if android " - Press BACK on your phone to close ChatBox)" #else ")";
+			typeTextHint.text = #if mobile "(Touch here to open your keyboard" + shit #else "(Type something to input the message, ACCEPT to send)" #end;
 		}
 		else {
 			FlxG.mouse.visible = prevMouseVisibility;
@@ -134,9 +136,9 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
 
 		#if mobile
 		if (TouchFunctions.touchJustPressed && TouchFunctions.touchOverlapObject(typeBg))
-			focused = FlxG.stage.window.textInputEnabled = true;
+			typing = FlxG.stage.window.textInputEnabled = true;
 		else if(TouchFunctions.touchJustReleased && !TouchFunctions.touchOverlapObject(typeBg))
-			focused = FlxG.stage.window.textInputEnabled = false;
+			typing = FlxG.stage.window.textInputEnabled = false;
 		#else
 		if (FlxG.keys.justPressed.TAB || FlxG.keys.justPressed.ESCAPE)
 			focused = !focused;
@@ -145,23 +147,14 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
 
 		typeTextHint.visible = focused ? (typeText.text.length <= 0) : true;
 
-		#if mobile
-		if (!focused && targetAlpha > 0.)
-			targetAlpha -= elapsed;
-		forEachAlive(function(object:FlxSprite){
-			if(object != typeBg)
-				object.alpha = targetAlpha;
-		});
-		#else
 		if(!focused && targetAlpha > 0.)
 			targetAlpha -= elapsed;
 		alpha = targetAlpha;
-		#end
     }
 
 	// some code from FlxInputText
 	function onKeyDown(e:KeyboardEvent) {
-		if (!focused)
+		if (!focused #if mobile && !typing #end)
 			return;
 
 		var key = e.keyCode;
