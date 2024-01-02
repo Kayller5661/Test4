@@ -17,7 +17,7 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
 		if (v) {
 			prevMouseVisibility = FlxG.mouse.visible;
 			FlxG.mouse.visible = true;
-			var shit = #if android " - Press BACK on your phone to close ChatBox)" #else ")";
+			var shit = #if android " - Press BACK on your phone to close ChatBox)" #else ")" #end;
 			typeTextHint.text = #if mobile "(Touch here to open your keyboard" + shit #else "(Type something to input the message, ACCEPT to send)" #end;
 		}
 		else {
