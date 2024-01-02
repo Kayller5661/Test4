@@ -61,6 +61,10 @@ class ServerSettingsSubstate extends MusicBeatSubstate {
 		swapSides.ID = 2;
 
 		add(items);
+
+		#if mobileC
+		addVirtualPad(UP_DOWN, A_B);
+		#end
     }
 
     override function update(elapsed) {
@@ -82,11 +86,12 @@ class ServerSettingsSubstate extends MusicBeatSubstate {
 		else if (curSelectedID < 0) {
 			curSelectedID = items.length - 1;
 		}
-
         items.forEach((option) -> {
+			#if !mobile
 			if (FlxG.mouse.justMoved && FlxG.mouse.overlaps(option)) {
 				curSelectedID = option.ID;
             }
+			#end
 
 			if (option.ID == curSelectedID) {
                 option.box.visible = true;
@@ -153,10 +158,11 @@ class CheckboxOption extends FlxSpriteGroup {
 
 		if (GameClient.room == null)
 			return;
-
+		#if !mobile
         if (FlxG.mouse.overlaps(this) && FlxG.mouse.justPressed) {
             onClick();
         }
+		#end
 
 		onUpdate(elapsed);
     }

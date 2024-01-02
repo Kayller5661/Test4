@@ -4,12 +4,9 @@ import sys.thread.Thread;
 import backend.Rating;
 import online.schema.Player;
 import haxe.Http;
-import sys.io.File;
-import sys.FileSystem;
 import online.states.Lobby;
+import online.states.FindRoom;
 import io.colyseus.error.MatchMakeError;
-import lime.app.Application;
-import io.colyseus.events.EventHandler;
 import states.MainMenuState;
 import online.schema.RoomState;
 import io.colyseus.Client;
@@ -27,10 +24,19 @@ class GameClient {
 	public static var serverAddress(get, set):String;
 
     public static function createRoom(?onJoin:()->Void) {
+		// should be outside of the connecting thread since it'll freeze
+		if(Std.isOfType(MusicBeatState.getState(), Lobby)) {
+			Lobby.loadingIcon.alpha = 1;
+			Lobby.connecting = true;
+		}
 		#if (target.threaded) Thread.create(() -> {#end
 		client = new Client(serverAddress);
 		client.create("room", ["name" => ClientPrefs.data.nickname, "version" => MainMenuState.psychOnlineVersion], RoomState, function(err, room) {
             if (err != null) {
+				if(Std.isOfType(MusicBeatState.getState(), Lobby)){
+					Lobby.loadingIcon.alpha = 0;
+					Lobby.connecting = false;
+				}
 				Alert.alert("Couldn't connect!", "ERROR: " + err.code + " - " + err.message + (err.code == 0 ? "\nTry again in a few minutes! The server is probably restarting!" : ""));
 				client = null;
                 return;
@@ -64,10 +70,28 @@ class GameClient {
     }
 
     public static function joinRoom(roomID:String, ?onJoin:()->Void) {
+		if(Std.isOfType(MusicBeatState.getState(), Lobby) || Std.isOfType(MusicBeatState.getState(), FindRoom)) {
+			var state:Dynamic;
+			if(Std.isOfType(MusicBeatState.getState(), Lobby))
+				state = Lobby;
+			else
+				state = FindRoom;
+			state.loadingIcon.alpha = 1;
+			state.connecting = true;
+		}
 		#if (target.threaded) Thread.create(() -> {#end
 		client = new Client(serverAddress);
 		client.joinById(roomID, ["name" => ClientPrefs.data.nickname, "version" => MainMenuState.psychOnlineVersion], RoomState, function(err, room) {
             if (err != null) {
+				if(Std.isOfType(MusicBeatState.getState(), Lobby) || Std.isOfType(MusicBeatState.getState(), FindRoom)) {
+					var state:Dynamic;
+					if(Std.isOfType(MusicBeatState.getState(), Lobby))
+						state = Lobby;
+					else
+						state = FindRoom;
+					state.loadingIcon.alpha = 0;
+					state.connecting = false;
+				}
 				Alert.alert("Couldn't connect!", "JOIN ERROR: " + err.code + " - " + err.message);
 				client = null;
                 return;

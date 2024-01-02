@@ -1,5 +1,6 @@
 package online;
 
+import backend.TouchFunctions;
 import online.states.OpenURL;
 import flixel.math.FlxRect;
 import openfl.events.KeyboardEvent;
@@ -15,11 +16,11 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
 		if (v) {
 			prevMouseVisibility = FlxG.mouse.visible;
 			FlxG.mouse.visible = true;
-			typeTextHint.text = "(Type something to input the message, ACCEPT to send)";
+			typeTextHint.text = #if mobile "" #else "(Type something to input the message, ACCEPT to send)" #end;
 		}
 		else {
 			FlxG.mouse.visible = prevMouseVisibility;
-			typeTextHint.text = "(Press TAB to open chat!)";
+			typeTextHint.text = #if mobile "(Touch here to open your keyboard)" #else "(Press TAB to open chat!)" #end;
 		}
 		targetAlpha = v ? 3 : 0;
 		return focused = v;
@@ -43,7 +44,7 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
 		bg.alpha = 0.6;
         add(bg);
 
-		typeTextHint = new FlxText(0, 0, bg.width, "(Type something to input the message, ACCEPT to send)");
+		typeTextHint = new FlxText(0, 0, bg.width, #if mobile "(Touch here to open your keyboard)" #else "(Type something to input the message, ACCEPT to send)" #end);
 		typeTextHint.setFormat("VCR OSD Mono", 16, FlxColor.WHITE);
 		typeTextHint.alpha = 0.6;
 
@@ -131,16 +132,31 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
 
         super.update(elapsed);
 
-		if (FlxG.keys.justPressed.TAB || FlxG.keys.justPressed.ESCAPE) {
+		#if mobile
+		if (TouchFunctions.touchJustPressed && TouchFunctions.touchOverlapObject(typeBg))
+			focused = FlxG.stage.window.textInputEnabled = true;
+		else if(TouchFunctions.touchJustReleased && !TouchFunctions.touchOverlapObject(typeBg))
+			focused = FlxG.stage.window.textInputEnabled = false;
+		#else
+		if (FlxG.keys.justPressed.TAB || FlxG.keys.justPressed.ESCAPE)
 			focused = !focused;
-		}
+		#end
+
 
 		typeTextHint.visible = focused ? (typeText.text.length <= 0) : true;
 
+		#if mobile
 		if (!focused && targetAlpha > 0.)
 			targetAlpha -= elapsed;
-
+		forEachAlive(function(object:FlxSprite){
+			if(object != typeBg)
+				object.alpha = targetAlpha;
+		});
+		#else
+		if(!focused && targetAlpha > 0.)
+			targetAlpha -= elapsed;
 		alpha = targetAlpha;
+		#end
     }
 
 	// some code from FlxInputText

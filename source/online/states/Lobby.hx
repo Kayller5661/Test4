@@ -1,5 +1,7 @@
 package online.states;
 
+import flixel.addons.transition.FlxTransitionableState;
+import objects.HealthIcon;
 import lime.system.Clipboard;
 import haxe.Json;
 import states.MainMenuState;
@@ -59,8 +61,13 @@ class Lobby extends MusicBeatState {
 	var selectLine:FlxSprite;
 	var descBox:FlxSprite;
 
+	public static var loadingIcon:HealthIcon;
+	public static var connecting:Bool = false;
+
     function onRoomJoin() {
 		Waiter.put(() -> {
+			Lobby.loadingIcon.alpha = 0;
+			Lobby.connecting = false;
 			MusicBeatState.switchState(new Room());
 		});
     }
@@ -155,6 +162,13 @@ class Lobby extends MusicBeatState {
 
 		changeSelection(0);
 
+		loadingIcon = new HealthIcon();
+		add(loadingIcon);
+		loadingIcon.alpha = 0;
+		loadingIcon.sprTracker = null; // so it dosen't keep updating the position on it's own
+		loadingIcon.setPosition(FlxG.width - 140, FlxG.height - 140);
+		FlxTween.tween(loadingIcon, {angle : 360} , 0.8, {type: FlxTweenType.LOOPING});
+
 		#if mobileC
 		addVirtualPad(UP_DOWN, A_B);
 		#end
@@ -183,22 +197,24 @@ class Lobby extends MusicBeatState {
 
 		#if desktop
 		var mouseInItems = FlxG.mouse.y > items.y && FlxG.mouse.y < items.y + items.members.length * 40;
+		if(!connecting){
 
-		if (FlxG.mouse.justPressed && inputWait && mouseInItems) {
-			enterInput();
-			return;
-		}
+			if (FlxG.mouse.justPressed && inputWait && mouseInItems) {
+				enterInput();
+				return;
+			}
 
-		if (FlxG.mouse.justPressedRight && inputWait && Clipboard.text != null) {
-			inputString += Clipboard.text;
-		}
+			if (FlxG.mouse.justPressedRight && inputWait && Clipboard.text != null) {
+				inputString += Clipboard.text;
+			}
 
-		if (FlxG.mouse.justMoved && !inputWait && mouseInItems) {
-			curSelected = Std.int((FlxG.mouse.y - (items.y)) / 40);
-			changeSelection(0);
+			if (FlxG.mouse.justMoved && !inputWait && mouseInItems) {
+				curSelected = Std.int((FlxG.mouse.y - (items.y)) / 40);
+				changeSelection(0);
+			}
 		}
 		#end
-		if (!inputWait) {
+		if (!inputWait || !connecting) {
 			if (controls.UI_UP_P)
 				changeSelection(-1);
 			else if (controls.UI_DOWN_P)
@@ -210,7 +226,8 @@ class Lobby extends MusicBeatState {
 						inputWait = FlxG.stage.window.textInputEnabled = true;
 					case "find":
 						// FlxG.openURL(GameClient.serverAddress + "/rooms");
-						FlxG.switchState(new FindRoom());
+						FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
+						MusicBeatState.switchState(new FindRoom());
 					case "host":
 						GameClient.createRoom(onRoomJoin);
 					case "mods":

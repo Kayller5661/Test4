@@ -315,7 +315,7 @@ class FreeplayState extends MusicBeatState
 			_updateSongLastDifficulty();
 		}
 
-		if (controls.BACK #if mobileC && virtualPad.buttonC.pressed #end)
+		if (controls.BACK #if mobileC && !virtualPad.buttonC.pressed #end)
 		{
 			persistentUpdate = false;
 			if(colorTween != null) {

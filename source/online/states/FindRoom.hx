@@ -1,22 +1,29 @@
 package online.states;
 
+import flixel.addons.transition.FlxTransitionableState;
+import objects.HealthIcon;
 import states.MainMenuState;
 import flixel.FlxObject;
 import io.colyseus.Client.RoomAvailable;
 import lime.app.Application;
+#if (target.threaded)
+import sys.thread.Thread;
+#end
 
 class FindRoom extends MusicBeatState {
 	var swagRooms:FlxTypedSpriteGroup<RoomText>;
-    public static var curSelected:Int;
-    public static var curRoom:Room;
+    public var curSelected:Int;
+    public var curRoom:Room;
     public static var coolControls:Controls;
+	public static var loadingIcon:HealthIcon;
+	public static var connecting:Bool = false;
+	public static var instance:FindRoom;
 
     var noRoomsText:FlxText;
 
     public function new() {
         super();
-
-		coolControls = controls;
+		instance = this;
 
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = 0xff2d3683;
@@ -42,10 +49,26 @@ class FindRoom extends MusicBeatState {
 		noRoomsText.screenCenter(XY);
 		noRoomsText.scrollFactor.set(0, 0);
 		add(noRoomsText);
+
+		loadingIcon = new HealthIcon();
+		add(loadingIcon);
+		loadingIcon.alpha = 0;
+		loadingIcon.sprTracker = null; // so it dosen't keep updating the position on it's own
+		loadingIcon.setPosition(FlxG.width - 140, FlxG.height - 140);
+		FlxTween.tween(loadingIcon, {angle : 360} , 0.8, {type: FlxTweenType.LOOPING});
+
+		#if mobileC
+		addVirtualPad(UP_DOWN, A_B_C);
+		#end
+		
+		coolControls = controls;
     }
 
     override function create() {
-		refreshRooms();
+		if(swagRooms != null)
+			refreshRooms();
+		super.create();
+		
     }
 
     override function update(elapsed) {
@@ -53,30 +76,35 @@ class FindRoom extends MusicBeatState {
 
 		noRoomsText.visible = swagRooms.length <= 0;
 
-        if (FlxG.keys.justPressed.R) {
-            refreshRooms();
-        }
+		if(!connecting){
 
-		if (controls.UI_UP_P)
-			curSelected--;
-		else if (controls.UI_DOWN_P)
-			curSelected++;
+		    if ((FlxG.keys.justPressed.R #if mobileC || virtualPad.buttonC.justPressed #end) && swagRooms != null) {
+		        refreshRooms();
+		    }
 
-		if (curSelected >= swagRooms.length) {
-			curSelected = 0;
+			if (controls.UI_UP_P)
+				curSelected--;
+			else if (controls.UI_DOWN_P)
+				curSelected++;
+
+			if (curSelected >= swagRooms.length) {
+				curSelected = 0;
+			}
+			else if (curSelected < 0) {
+				curSelected = swagRooms.length - 1;
+			}
+
+
+		    if (controls.BACK) {
+				FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
+				MusicBeatState.switchState(new Lobby());
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+		    }
 		}
-		else if (curSelected < 0) {
-			curSelected = swagRooms.length - 1;
-		}
-
-		
-        if (controls.BACK) {
-			FlxG.switchState(new Lobby());
-			FlxG.sound.play(Paths.sound('cancelMenu'));
-        }
     }
 
     function refreshRooms() {
+		#if (target.threaded) Thread.create(() -> {#end
 		curSelected = 0;
 		swagRooms.clear();
 
@@ -102,6 +130,9 @@ class FindRoom extends MusicBeatState {
                 }
             });
         });
+	#if (target.threaded)
+	});
+	#end
     }
 }
 
@@ -122,8 +153,8 @@ class RoomText extends FlxText {
     override function update(elapsed) {
         super.update(elapsed);
 
-		if (FindRoom.curSelected != _prevSelected) {
-			if (FindRoom.curSelected == ID) {
+		if (FindRoom.instance.curSelected != _prevSelected) {
+			if (FindRoom.instance.curSelected == ID) {
 				text = "> " + daText + " <";
 				alpha = 1;
 				FlxG.camera.follow(this);
@@ -134,13 +165,15 @@ class RoomText extends FlxText {
 			}
         }
 
-		if (FindRoom.curSelected == ID && !FlxG.keys.justPressed.R && FindRoom.coolControls.ACCEPT) {
+		if (FindRoom.instance.curSelected == ID && (!FlxG.keys.justPressed.R #if mobileC || !MusicBeatState.instance.virtualPad.buttonC.pressed #end) && FindRoom.coolControls.ACCEPT) {
 			GameClient.joinRoom(code, () -> Waiter.put(() -> {
-                trace("joining room: " + code);
+               	trace("joining room: " + code);
+				FindRoom.connecting = false;
+				FindRoom.loadingIcon.alpha = 0;
 				MusicBeatState.switchState(new Room());
 			}));
 		}
 
-		_prevSelected = FindRoom.curSelected;
+		_prevSelected = FindRoom.instance.curSelected;
     }
 }
