@@ -144,10 +144,19 @@ class PostGame extends MusicBeatState {
 		new FlxTimer().start(5, (t) -> {
 			disableInput = false;
 		});
+
+		#if mobileC
+		addVirtualPad(NONE, B_C);
+		#end
     }
 
 	override function update(elapsed) {
         super.update(elapsed);
+
+		#if mobileC
+		if(virtualPad.buttonC.justPressed)
+			chatBox.focused != !chatBox.focused;
+		#end
 
 		if (!disableInput) {
 			if (back.animation.curAnim.name != "press")

@@ -144,6 +144,11 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
 			focused = !focused;
 		#end
 
+		#if mobile
+		if(#if android FlxG.android.justReleased.BACK #else MusicBeatState.instance.virtualPad != null && MusicBeatState.instance.virtualPad.buttonB.justPressed #end)
+			focused = false;
+		#end
+
 
 		typeTextHint.visible = focused ? (typeText.text.length <= 0) : true;
 

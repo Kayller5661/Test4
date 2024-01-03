@@ -346,11 +346,6 @@ class Room extends MusicBeatState {
         });
         #end
 
-		#if android
-		if(FlxG.android.justReleased.BACK)
-			chatBox.focused = false;
-		#end
-
 		if (elapsedShit >= 3) {
 			elapsedShit = 0;
 			if (GameClient.room.state.isPrivate) {
