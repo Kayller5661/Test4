@@ -46,6 +46,7 @@ class SetupMods extends MusicBeatState {
 			}
 			text.ID = i;
 			text.setFormat("VCR OSD Mono", 30, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+			text.screenCenter(X);
 			items.add(prevText = text);
 			modsInput.push(OnlineMods.getModURL(itm));
 			i++;
@@ -53,9 +54,12 @@ class SetupMods extends MusicBeatState {
 		items.screenCenter(Y);
 		add(items);
 
-		var title = new FlxText(0, 0, FlxG.width, 
-        "Before you play, it is recommended to set links for your mods!\nGamebanana mod links need to look similiar to this: https://gamebanana.com/mods/479714\nSelect them with ACCEPT, paste links with CTRL + V\nWhen you finish or if you want to skip press BACK"
-        );
+		var str = "Before you play, it is recommended to set links for your mods!\nGamebanana mod links need to look similiar to this: https://gamebanana.com/mods/479714\nSelect them with ACCEPT, paste links with CTRL + V\nWhen you finish or if you want to skip press BACK";
+		#if mobile
+		str = "Before you play, it is recommended to set links for your mods!\nGamebanana mod links need to look similiar to this: https://gamebanana.com/mods/479714\nSelect the mod with A, paste links with C\nWhen you finish or if you want to skip press B";
+		#end
+
+		var title = new FlxText(0, 0, FlxG.width, str);
 		title.setFormat("VCR OSD Mono", 22, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		title.y = 50;
 		title.scrollFactor.set(0, 0);
@@ -74,16 +78,33 @@ class SetupMods extends MusicBeatState {
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 
 		changeSelection(0);
+
+		#if mobileC
+		addVirtualPad(UP_DOWN, A_B_C);
+		#end
     }
 
     override function update(elapsed:Float) {
         super.update(elapsed);
+		#if mobileC
+		if(virtualPad.buttonC.justReleased){
+			inInput = true;
+			changeSelection(0);
+			modsInput[curSelected] = Clipboard.text;
+		}
+		#end
+		#if android
+		if(FlxG.android.justPressed.BACK){
+			inInput = false;
+			changeSelection(0);
+		}
+		#end
 
         if (disableInput) return;
 
 		if (!inInput) {
 			if (controls.ACCEPT) {
-				inInput = true;
+				FlxG.stage.window.textInputEnabled = inInput = true;
 				changeSelection(0);
 			}
             
