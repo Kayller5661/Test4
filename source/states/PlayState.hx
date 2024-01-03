@@ -680,6 +680,30 @@ class PlayState extends MusicBeatState
 		#end
 		#if mobileC
 		addMobileControls(false);
+		var buttonsColors:Array<FlxColor> = [];
+		var data:Dynamic;
+		if(ClientPrefs.data.dynamicColors)
+			data = ClientPrefs.data;
+		else
+			data = ClientPrefs.defaultData;
+
+		buttonsColors.push(data.arrowRGB[0][0]);
+		buttonsColors.push(data.arrowRGB[1][0]);
+		buttonsColors.push(data.arrowRGB[2][0]);
+		buttonsColors.push(data.arrowRGB[3][0]);
+
+		if(MobileControls.getMode() == 0 || MobileControls.getMode() == 1 || MobileControls.getMode() == 2 || MobileControls.getMode() == 3) {
+			mobileControls.virtualPad.buttonLeft.color =  buttonsColors[0];
+			mobileControls.virtualPad.buttonDown.color =  buttonsColors[1];
+			mobileControls.virtualPad.buttonUp.color =  buttonsColors[2];
+			mobileControls.virtualPad.buttonRight.color =  buttonsColors[3];
+		}
+		if(MobileControls.getMode() == 3) {
+			mobileControls.virtualPad.buttonLeft2.color = buttonsColors[0];
+			mobileControls.virtualPad.buttonDown2.color = buttonsColors[1];
+			mobileControls.virtualPad.buttonUp2.color = buttonsColors[2];
+			mobileControls.virtualPad.buttonRight2.color = buttonsColors[3];
+		}
 		#if !android
 		addVirtualPad(NONE, P);
 		#end
@@ -3776,7 +3800,7 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
-	public function initLuaShader(name:String, ?glslVersion:Int = 120)
+	public function initLuaShader(name:String, ?glslVersion:Int = #if mobile 100 #else 120 #end)
 	{
 		if(!ClientPrefs.data.shaders) return false;
 

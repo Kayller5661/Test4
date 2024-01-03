@@ -2,16 +2,10 @@ package openfl.display;
 
 import openfl.text.TextField;
 import openfl.text.TextFormat;
-#if gl_stats
-import openfl.display._internal.stats.Context3DStats;
-import openfl.display._internal.stats.DrawCallContext;
-#end
+import openfl.system.System as OpenflSystem;
+import lime.system.System as LimeSystem;
 #if flash
 import openfl.Lib;
-#end
-
-#if openfl
-import openfl.system.System;
 #end
 
 /**
@@ -83,10 +77,10 @@ class FPS extends TextField
 
 		if (currentCount != cacheCount /*&& visible*/)
 		{
-			var memoryMegas:Float = Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 1));
+			var memoryMegas:Float = Math.abs(FlxMath.roundDecimal(OpenflSystem.totalMemory / 1000000, 1));
 			text = 'FPS: $currentFPS' +
 				'\nMemory: $memoryMegas MB' +
-				'\nPlatform: ${lime.system.System.platformLabel}';
+				'\nOS: ${LimeSystem.platformName + ' - ' + LimeSystem.platformVersion}';
 
 			textColor = 0xFFFFFFFF;
 			if (memoryMegas > 3000 || currentFPS <= ClientPrefs.data.framerate / 2)

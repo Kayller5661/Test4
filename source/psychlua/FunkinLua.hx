@@ -1679,7 +1679,7 @@ class FunkinLua {
 	#if (MODS_ALLOWED && !flash && sys)
 	public var runtimeShaders:Map<String, Array<String>> = new Map<String, Array<String>>();
 	#end
-	public function initLuaShader(name:String, ?glslVersion:Int = 120)
+	public function initLuaShader(name:String, ?glslVersion:Int = #if mobile 100 #else 120 #end)
 	{
 		if(!ClientPrefs.data.shaders) return false;
 

@@ -10,27 +10,27 @@
     {
       "name": "openfl",
       "type": "haxelib",
-      "version": "9.2.2"
+      "version": null
     },
     {
       "name": "flixel",
       "type": "haxelib",
-      "version": "5.3.1"
+      "version": null
     },
     {
       "name": "flixel-addons",
       "type": "haxelib",
-      "version": "3.2.1"
+      "version": null
     },
     {
       "name": "flixel-tools",
       "type": "haxelib",
-      "version": "1.5.1"
+      "version": null
     },
     {
       "name": "flixel-ui",
       "type": "haxelib",
-      "version": "2.5.0"
+      "version": null
     },
     {
       "name": "hxcpp",
@@ -40,11 +40,11 @@
       "url": "https://github.com/mcagabe19-stuff/hxcpp"
     },
     {
-      "name": "hxvlc",
+      "name": "hxCodec",
       "type": "git",
       "dir": null,
       "ref": "main",
-      "url": "https://github.com/MAJigsaw77/hxvlc"
+      "url": "https://github.com/mcagabe19-stuff/hxCodec"
     },
     {
       "name": "SScript",
