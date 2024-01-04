@@ -68,7 +68,7 @@ class OptionsState extends MusicBeatState
 		ClientPrefs.saveSettings();
 
 		#if mobileC
-		addVirtualPad(LEFT_FULL, A_B_C);
+		addVirtualPad(UP_DOWN, A_B_C);
 		#end
 
 		super.create();
@@ -78,7 +78,7 @@ class OptionsState extends MusicBeatState
 		ClientPrefs.saveSettings();
 		#if mobileC
 		removeVirtualPad();
-		addVirtualPad(LEFT_FULL, A_B_C);
+		addVirtualPad(UP_DOWN, A_B_C);
 		controls.isInSubstate = false;
 		#end
 		super.closeSubState();
