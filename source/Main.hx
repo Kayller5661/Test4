@@ -125,6 +125,9 @@ class Main extends Sprite
 		#if android
 		FlxG.android.preventDefaultKeys = [BACK];
 		#end
+		#if mobile
+		lime.system.System.allowScreenTimeout = ClientPrefs.data.screensaver;
+		#end
 
 		// shader coords fix
 		FlxG.signals.gameResized.add(function (w, h) {

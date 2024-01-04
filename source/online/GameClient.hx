@@ -44,6 +44,9 @@ class GameClient {
 			Sys.println("joined!");
 
 			FlxG.autoPause = false;
+			#if mobile
+			lime.system.System.allowScreenTimeout = false;
+			#end
 
             GameClient.room = room;
 			clearOnMessage();
@@ -98,6 +101,9 @@ class GameClient {
 			Sys.println("joined!");
 
 			FlxG.autoPause = false;
+			#if mobile
+			lime.system.System.allowScreenTimeout = false;
+			#end
 
             GameClient.room = room;
 			clearOnMessage();
@@ -184,6 +190,9 @@ class GameClient {
 			Sys.println("leaving the room");
 
 			FlxG.autoPause = ClientPrefs.data.autoPause;
+			#if mobile
+			lime.system.System.allowScreenTimeout = ClientPrefs.data.screensaver;
+			#end
 
 			FlxG.switchState(new Lobby());
 			FlxG.sound.play(Paths.sound('cancelMenu'));

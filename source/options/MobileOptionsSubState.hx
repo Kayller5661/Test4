@@ -1,5 +1,7 @@
 package options;
 
+import lime.system.System;
+
 class MobileOptionsSubState extends BaseOptionsMenu
 {
 	var mafaka:Float;
@@ -39,6 +41,15 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		option.changeValue = 0.1;
 		option.decimals = 1;
 		option.onChange = setAlpha;
+		addOption(option);
+
+		var option:Option = new Option('Allow Phone ScreenSaver',
+			'If checked, the phone will sleep after going inactive for few seconds',
+			'screensaver',
+			'bool');
+		option.onChange = () -> {
+			System.allowScreenTimeout = option.getValue();
+		};
 		addOption(option);
 
 		super();
