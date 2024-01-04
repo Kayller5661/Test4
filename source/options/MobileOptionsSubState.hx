@@ -4,7 +4,6 @@ import lime.system.System;
 
 class MobileOptionsSubState extends BaseOptionsMenu
 {
-	var mafaka:Float;
 	public function new()
 	{
 		title = 'Mobile Options';
@@ -40,7 +39,9 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		option.maxValue = 1;
 		option.changeValue = 0.1;
 		option.decimals = 1;
-		option.onChange = setAlpha;
+		option.onChange = () -> {
+			virtualPad.alpha = curOption.getValue();
+		};
 		addOption(option);
 
 		var option:Option = new Option('Allow Phone ScreenSaver',
@@ -48,16 +49,10 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			'screensaver',
 			'bool');
 		option.onChange = () -> {
-			System.allowScreenTimeout = option.getValue();
+			System.allowScreenTimeout = curOption.getValue();
 		};
 		addOption(option);
 
 		super();
-	}
-	public function setAlpha():Void {
-		if (curOption.getValue() != mafaka)
-			mafaka = curOption.getValue();
-
-		virtualPad.alpha = mafaka;
 	}
 }
