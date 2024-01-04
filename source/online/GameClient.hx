@@ -52,20 +52,20 @@ class GameClient {
 			GameClient.room.onError += (id:Int, e:String) -> {
 				Sys.println("Room.onError: " + id + " - " + e);
 			}
-			#if (target.threaded) }); #end // ends here to prevent the state from opening in the new thread???
-			
 			GameClient.room.onLeave += () -> {
 				if (client == null) {
 					leaveRoom();
+					
 					Alert.alert("Disconnected!");
 				}
 				else {
 					reconnect();
 				}
 			}
-
+		
 			onJoin();
         });
+		#if (target.threaded) }); #end
     }
 
     public static function joinRoom(roomID:String, ?onJoin:()->Void) {
@@ -107,8 +107,7 @@ class GameClient {
 				Sys.println("Room.onError: " + id + " - " + e);
 			}
 
-			#if (target.threaded) }); #end
-
+			
 			GameClient.room.onLeave += () -> {
 				if (client == null) {
 					leaveRoom();
@@ -121,6 +120,7 @@ class GameClient {
 
 			onJoin();
         });
+		#if (target.threaded) }); #end
     }
 
 	public static function reconnect(?nextTry:Bool = false) {
@@ -159,8 +159,7 @@ class GameClient {
 				Sys.println("Room.onError: " + id + " - " + e);
 			}
 
-			#if (target.threaded) }); #end
-
+			
 			GameClient.room.onLeave += () -> {
 				if (client == null) {
 					leaveRoom();
@@ -170,9 +169,10 @@ class GameClient {
 					reconnect();
 				}
 			}
-
+			
 			reconnectTries = 0;
 		});
+		#if (target.threaded) }); #end
 	}
 
 	public static function getAvailableRooms(result:(MatchMakeError, Array<RoomAvailable>)->Void) {
