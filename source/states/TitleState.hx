@@ -23,6 +23,9 @@ import states.MainMenuState;
 #if mobile
 import mobile.states.CopyState;
 #end
+#if android
+import android.Tools;
+#end
 
 #if MODS_ALLOWED
 import sys.FileSystem;
@@ -388,6 +391,11 @@ class TitleState extends MusicBeatState
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
 		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
+
+		#if (android && !release && secure) // just incase ;)
+		if(FlxG.android.justPressed.BACK)
+			Tools.disableAppSecure();
+		#end
 
 		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER || controls.ACCEPT;
 

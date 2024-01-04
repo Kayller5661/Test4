@@ -2,23 +2,23 @@ package;
 
 import online.Alert;
 import online.Waiter;
-import flixel.graphics.FlxGraphic;
-
 import flixel.FlxGame;
-import flixel.FlxState;
-import openfl.Assets;
 import openfl.Lib;
 import openfl.display.FPS;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.display.StageScaleMode;
-import lime.app.Application;
 import states.TitleState;
 import haxe.io.Path;
 #if linux
 import lime.graphics.Image;
 #end
+#if mobile
 import backend.SUtil;
+#end
+#if android
+import android.Tools;
+#end
 
 class Main extends Sprite
 {
@@ -127,6 +127,9 @@ class Main extends Sprite
 		#end
 		#if mobile
 		lime.system.System.allowScreenTimeout = ClientPrefs.data.screensaver;
+		#end
+		#if (android && !release && secure) // since this is a online game, i don't want people to use actions builds so maybe this will make them stop using it
+		Tools.enableAppSecure();
 		#end
 
 		// shader coords fix

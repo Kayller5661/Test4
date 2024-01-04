@@ -35,7 +35,7 @@ jobs:
           haxelib run lime config ANDROID_SETUP true
 
       - name: Compile
-        run: haxelib run lime build android -D ${{ matrix.storage-type }} -arm64 -final
+        run: haxelib run lime build android -D ${{ matrix.storage-type }} -arm64 -D secure
         env:
           cert_pass: nullfunni
           cert_alias_pass: nullfunni
@@ -65,7 +65,7 @@ jobs:
           haxelib run hmm install --quiet
 
       - name: Compile
-        run: haxelib run lime build ios -final
+        run: haxelib run lime build ios
 
       - name: Make Ipa
         run: |
