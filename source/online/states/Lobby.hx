@@ -27,7 +27,7 @@ class Lobby extends MusicBeatState {
 
 	static var curSelected = 0;
 
-	var inputWait = false;
+	public static var inputWait = false;
 	var inputString(get, set):String;
 	function get_inputString():String {
 		switch (curSelected) {
@@ -197,7 +197,7 @@ class Lobby extends MusicBeatState {
 
 		#if desktop
 		var mouseInItems = FlxG.mouse.y > items.y && FlxG.mouse.y < items.y + items.members.length * 40;
-		if(!connecting){
+		if(!inputWait){
 
 			if (FlxG.mouse.justPressed && inputWait && mouseInItems) {
 				enterInput();
@@ -214,7 +214,7 @@ class Lobby extends MusicBeatState {
 			}
 		}
 		#end
-		if (!inputWait || !connecting) {
+		if (!inputWait) {
 			if (controls.UI_UP_P)
 				changeSelection(-1);
 			else if (controls.UI_DOWN_P)
@@ -302,7 +302,7 @@ class Lobby extends MusicBeatState {
 
     // some code from FlxInputText
 	function onKeyDown(e:KeyboardEvent) {
-		if (!inputWait) return;
+		if ((!inputWait && connecting) || (inputWait && connecting)) return;
 
 		var key = e.keyCode;
 

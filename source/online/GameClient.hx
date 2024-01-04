@@ -25,8 +25,8 @@ class GameClient {
     public static function createRoom(?onJoin:()->Void) {
 		// should be outside of the connecting thread since it'll freeze
 		if(Std.isOfType(MusicBeatState.getState(), Lobby)) {
-			Lobby.loadingIcon.alpha = 1;
-			Lobby.connecting = true;
+			Lobby.loadingIcon.alpha = 1; // just lobby since FindRoom dosen't use this function
+			Lobby.connecting = Lobby.inputWait = true;
 		}
 		#if (target.threaded) Thread.create(() -> {#end
 		client = new Client(serverAddress);
@@ -34,7 +34,7 @@ class GameClient {
             if (err != null) {
 				if(Std.isOfType(MusicBeatState.getState(), Lobby)){
 					Lobby.loadingIcon.alpha = 0;
-					Lobby.connecting = false;
+					Lobby.connecting = Lobby.inputWait = false;
 				}
 				Alert.alert("Couldn't connect!", "ERROR: " + err.code + " - " + err.message + (err.code == 0 ? "\nTry again in a few minutes! The server is probably restarting!" : ""));
 				client = null;
@@ -52,7 +52,8 @@ class GameClient {
 			GameClient.room.onError += (id:Int, e:String) -> {
 				Sys.println("Room.onError: " + id + " - " + e);
 			}
-
+			#if (target.threaded) }); #end // ends here to prevent the state from opening in the new thread???
+			
 			GameClient.room.onLeave += () -> {
 				if (client == null) {
 					leaveRoom();
@@ -65,16 +66,17 @@ class GameClient {
 
 			onJoin();
         });
-		#if (target.threaded) }); #end
     }
 
     public static function joinRoom(roomID:String, ?onJoin:()->Void) {
+		var state:Dynamic;
 		if(Std.isOfType(MusicBeatState.getState(), Lobby) || Std.isOfType(MusicBeatState.getState(), FindRoom)) {
-			var state:Dynamic;
-			if(Std.isOfType(MusicBeatState.getState(), Lobby))
+			if(Std.isOfType(MusicBeatState.getState(), Lobby)){
+				Lobby.inputWait = true;
 				state = Lobby;
-			else
+			} else {
 				state = FindRoom;
+			}
 			state.loadingIcon.alpha = 1;
 			state.connecting = true;
 		}
@@ -83,11 +85,8 @@ class GameClient {
 		client.joinById(roomID, ["name" => ClientPrefs.data.nickname, "version" => MainMenuState.psychOnlineVersion], RoomState, function(err, room) {
             if (err != null) {
 				if(Std.isOfType(MusicBeatState.getState(), Lobby) || Std.isOfType(MusicBeatState.getState(), FindRoom)) {
-					var state:Dynamic;
 					if(Std.isOfType(MusicBeatState.getState(), Lobby))
-						state = Lobby;
-					else
-						state = FindRoom;
+						Lobby.inputWait = false;
 					state.loadingIcon.alpha = 0;
 					state.connecting = false;
 				}
@@ -108,6 +107,8 @@ class GameClient {
 				Sys.println("Room.onError: " + id + " - " + e);
 			}
 
+			#if (target.threaded) }); #end
+
 			GameClient.room.onLeave += () -> {
 				if (client == null) {
 					leaveRoom();
@@ -120,7 +121,6 @@ class GameClient {
 
 			onJoin();
         });
-		#if (target.threaded) }); #end
     }
 
 	public static function reconnect(?nextTry:Bool = false) {
@@ -159,6 +159,8 @@ class GameClient {
 				Sys.println("Room.onError: " + id + " - " + e);
 			}
 
+			#if (target.threaded) }); #end
+
 			GameClient.room.onLeave += () -> {
 				if (client == null) {
 					leaveRoom();
@@ -171,7 +173,6 @@ class GameClient {
 
 			reconnectTries = 0;
 		});
-		#if (target.threaded) }); #end
 	}
 
 	public static function getAvailableRooms(result:(MatchMakeError, Array<RoomAvailable>)->Void) {

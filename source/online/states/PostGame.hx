@@ -155,7 +155,7 @@ class PostGame extends MusicBeatState {
 
 		#if mobileC
 		if(virtualPad.buttonC.justPressed)
-			chatBox.focused != !chatBox.focused;
+			chatBox.focused = !chatBox.focused;
 		#end
 
 		if (!disableInput) {
