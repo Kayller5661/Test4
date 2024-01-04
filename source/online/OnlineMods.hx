@@ -33,7 +33,7 @@ class OnlineMods {
 	}
 
 	public static function downloadMod(url:String) {
-		if (url == null || url.trim() == "")
+		if (url == null || url.trim() == "" || !url.contains("http"))
 			return;
 
 		if (StringTools.startsWith(url, "https://gamebanana.com/mods/")) {

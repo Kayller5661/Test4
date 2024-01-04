@@ -14,8 +14,8 @@ class OpenURL extends MusicBeatSubstate {
 	var swagPrompt:String = "Do you want to open URL:";
 
 	public static function open(url:String, ?swagPrompt:String) { 
-        if (FlxG.state.subState != null)
-			FlxG.state.subState.close();
+        //if (FlxG.state.subState != null)
+			//FlxG.state.subState.close();
 		FlxG.state.openSubState(new OpenURL(url, swagPrompt));
     }
 	function new(url:String, ?swagPrompt:String) {
