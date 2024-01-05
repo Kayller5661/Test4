@@ -141,7 +141,7 @@ class TitleState extends MusicBeatState
 			http.request();
 		}
 		#end
-		#if (!officialBuild && mobile)
+		#if (!officialBuild && mobile && !testing)
 		offlineMode = true;
 		#end
 
