@@ -44,7 +44,7 @@ class FindRoom extends MusicBeatState {
 		add(swagRooms);
 		curSelected = 0;
 
-		noRoomsText = new FlxText(0, 0, 0, "(No rooms found! Refresh the list using R)");
+		noRoomsText = new FlxText(0, 0, 0, "(No rooms found! Refresh the list using " + #if mobileC "C)" #else "R)" #end);
 		noRoomsText.setFormat("VCR OSD Mono", 25, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		noRoomsText.screenCenter(XY);
 		noRoomsText.scrollFactor.set(0, 0);
