@@ -33,13 +33,14 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
 	var typeBg:FlxSprite;
     var typeText:FlxText;
     var typeTextHint:FlxText; // i can call it a hint or tip whatever i want
+	var hitbox:FlxSprite;
 
 	var targetAlpha:Float;
 
     public function new() {
+		
+		super();
 		instance = this;
-
-        super();
         
         bg = new FlxSprite();
         bg.makeGraphic(600, 400, FlxColor.BLACK);
@@ -63,8 +64,12 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
 		typeTextHint.y = typeBg.y;
 		typeText.y = typeBg.y;
 
+		hitbox = new FlxSprite(0, FlxG.height-340);
+		hitbox.makeGraphic(Std.int(FlxG.width / 2.5), 40, FlxColor.TRANSPARENT);
+
 		add(typeTextHint);
 		add(typeText);
+		add(hitbox);
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 
@@ -135,9 +140,9 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
         super.update(elapsed);
 
 		#if mobileC
-		if (TouchFunctions.touchJustPressed && TouchFunctions.touchOverlapObject(typeTextHint))
+		if (TouchFunctions.touchJustPressed && TouchFunctions.touchOverlapObject(hitbox))
 			typing = FlxG.stage.window.textInputEnabled = true;
-		else if(TouchFunctions.touchJustReleased && !TouchFunctions.touchOverlapObject(typeTextHint))
+		else if(TouchFunctions.touchJustReleased && !TouchFunctions.touchOverlapObject(this))
 			typing = FlxG.stage.window.textInputEnabled = false;
 		if(#if android FlxG.android.justReleased.BACK #else MusicBeatState.instance.virtualPad != null && (MusicBeatState.instance.virtualPad.buttonB.justPressed || MusicBeatState.instance.virtualPad.buttonC.justPressed) #end)
 			focused = false;

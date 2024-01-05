@@ -455,21 +455,20 @@ class Room extends MusicBeatState {
 							selfPlayer = GameClient.room.state.player1;
 						else
 							selfPlayer = GameClient.room.state.player2;
-
-						if (GameClient.room.state.song == "")
-							return;
-
-						if (Mods.getModDirectories().contains(GameClient.room.state.modDir) || GameClient.room.state.modDir == "") {
-							Mods.currentModDirectory = GameClient.room.state.modDir;
-							try {
-								GameClient.send("verifyChart", Md5.encode(Song.loadRawSong(GameClient.room.state.song, GameClient.room.state.folder)));
+						if(GameClient.room.state.song != "") {
+							if (Mods.getModDirectories().contains(GameClient.room.state.modDir) || GameClient.room.state.modDir == "") {
+								Mods.currentModDirectory = GameClient.room.state.modDir;
+								try {
+									GameClient.send("verifyChart", Md5.encode(Song.loadRawSong(GameClient.room.state.song, GameClient.room.state.folder)));
+								}
+								catch (exc) {
+									return;
+								}
 							}
-							catch (exc) {}
-							return;
-						}
-
-						if (!selfPlayer.hasSong && GameClient.room.state.modDir != null && GameClient.room.state.modURL != null && GameClient.room.state.modURL != "") {
-							OnlineMods.downloadMod(GameClient.room.state.modURL);
+							
+							if (!selfPlayer.hasSong && GameClient.room.state.modDir != null && GameClient.room.state.modURL != null && GameClient.room.state.modURL != "" && GameClient.room.state.modURL.startsWith("http")) {
+								OnlineMods.downloadMod(GameClient.room.state.modURL);
+							}
 						}
 				}
 			}

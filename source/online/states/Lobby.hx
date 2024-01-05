@@ -66,8 +66,8 @@ class Lobby extends MusicBeatState {
 
     function onRoomJoin() {
 		Waiter.put(() -> {
-			Lobby.loadingIcon.alpha = 0;
-			Lobby.connecting = false;
+			loadingIcon.alpha = 0;
+			connecting = inputWait = false;
 			MusicBeatState.switchState(new Room());
 		});
     }

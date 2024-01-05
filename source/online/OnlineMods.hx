@@ -4,6 +4,9 @@ import online.states.SetupMods;
 import online.states.OpenURL;
 import sys.io.File;
 import sys.FileSystem;
+#if (target.threaded)
+import sys.thread.Thread;
+#end
 
 class OnlineMods {
 
@@ -33,22 +36,27 @@ class OnlineMods {
 	}
 
 	public static function downloadMod(url:String) {
-		if (url == null || url.trim() == "" || !url.contains("http"))
+		if (url == null || url.trim() == "" || !url.startsWith("http"))
 			return;
-
-		if (StringTools.startsWith(url, "https://gamebanana.com/mods/")) {
-			GameBanana.getMod(url.substring("https://gamebanana.com/mods/".length), (mod, err) -> {
-				Waiter.put(() -> {
-					if (err != null) {
-						Alert.alert("Failed to download!", "For mod: " + url + "\n" + err);
-						return;
-					}
-
-					GameBanana.downloadMod(mod);
+		#if (target.threaded)
+		Thread.create( ()-> {
+		#end
+			if (StringTools.startsWith(url, "https://gamebanana.com/mods/")) {
+				GameBanana.getMod(url.substring("https://gamebanana.com/mods/".length), (mod, err) -> {
+					Waiter.put(() -> {
+						if (err != null) {
+							Alert.alert("Failed to download!", "For mod: " + url + "\n" + err);
+							return;
+						}
+						
+						GameBanana.downloadMod(mod);
+					});
 				});
-			});
-			return;
-		}
+				return;
+			}
+		#if (target.threaded)
+		});
+		#end
 
 		OpenURL.open(url, "The following mod needs to be installed manually\nbecause it comes from an untrusted source\ndo you want to open this URL?");
 	}
