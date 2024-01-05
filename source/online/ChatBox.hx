@@ -140,9 +140,9 @@ class ChatBox extends FlxTypedSpriteGroup<FlxSprite> {
         super.update(elapsed);
 
 		#if mobileC
-		if (TouchFunctions.touchJustPressed && TouchFunctions.touchOverlapObject(hitbox))
+		if (TouchFunctions.touchJustPressed && TouchFunctions.touchOverlapObject(hitbox) && focused)
 			typing = FlxG.stage.window.textInputEnabled = true;
-		else if(TouchFunctions.touchJustReleased && !TouchFunctions.touchOverlapObject(this))
+		else if(TouchFunctions.touchJustReleased && !TouchFunctions.touchOverlapObject(this) && focused)
 			typing = FlxG.stage.window.textInputEnabled = false;
 		if(#if android FlxG.android.justReleased.BACK #else MusicBeatState.instance.virtualPad != null && (MusicBeatState.instance.virtualPad.buttonB.justPressed || MusicBeatState.instance.virtualPad.buttonC.justPressed) #end)
 			focused = false;
