@@ -3236,8 +3236,11 @@ class PlayState extends MusicBeatState
 				rating = popUpScore(note);
 			}
 			addHealth(note.hitHealth * healthGain);
+			var ratingImage:String = 'sick';
+			if (rating != null)
+				ratingImage = rating.image;
 
-			GameClient.send("noteHit", [note.strumTime, note.noteData, note.isSustainNote, rating?.image]);
+			GameClient.send("noteHit", [note.strumTime, note.noteData, note.isSustainNote, ratingImage]);
 
 			if(!note.noAnimation) {
 				var altAnim:String = "";
