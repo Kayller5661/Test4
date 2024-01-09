@@ -200,7 +200,7 @@ class GameClient {
 
 			GameClient.client = null;
 
-			if (GameClient.room?.connection != null) {
+			if (GameClient.room != null && GameClient.room.connection != null) {
 				GameClient.room.connection.close();
 				GameClient.room.teardown();
             }
@@ -218,7 +218,7 @@ class GameClient {
 
 	@:access(io.colyseus.Room.onMessageHandlers)
 	public static function clearOnMessage() {
-		if (GameClient.isConnected() && GameClient.room?.onMessageHandlers != null)
+		if (GameClient.isConnected() && GameClient.room != null && GameClient.room.onMessageHandlers != null)
 			GameClient.room.onMessageHandlers.clear();
 
 		GameClient.room.onMessage("ping", function(message) {
